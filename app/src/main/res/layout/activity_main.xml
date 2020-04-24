@@ -8,10 +8,55 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <ListView
-        android:id="@+id/listView1"
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+<!--        <SearchView-->
+<!--            android:id="@+id/searchview"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+<!--        </SearchView>-->
+
+<!--        <android.support.v7.widget.SearchView-->
+<!--            android:id="@+id/searchview"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:clickable="true" />-->
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchview">
+
+        </EditText>
+
+        <Button
+            android:id="@+id/searchbutton"
+            android:layout_width="89dp"
+            android:layout_height="40dp"
+            android:layout_alignRight="@+id/searchview"
+            android:hint="検索"></Button>
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/searchview"
+            app:layout_anchorGravity="center" />
+
+
+
+        <!--    <EditText-->
+        <!--        android:layout_width="match_parent"-->
+        <!--        android:layout_height="wrap_content"-->
+        <!--        android:imeOptions="actionSearch"-->
+        <!--        android:inputType="text"-->
+        <!--        android:text="検索"-->
+        <!--        android:id="@+id/search"/>-->
+
+    </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -21,5 +66,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/plus"
         app:backgroundTint="@color/colorPrimary"/>
+
 
 </android.support.design.widget.CoordinatorLayout>

@@ -2,11 +2,15 @@
 
 buildscript {
     ext.kotlin_version = '1.3.50'
+    //どこのリポジトリを見に行くかを設定
     repositories {
+        //google()はGoogleが提供しているソフトウェアの配布を行う為のサービスのリポジトリ
         google()
+        //JFrogが提供しているソフトウェアの配布を行う為のサービスのリポジトリ
         jcenter()
         
     }
+    //実際に使いたいライブラリを指定
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"

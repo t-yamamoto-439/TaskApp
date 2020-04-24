@@ -34,6 +34,8 @@ class InputActivity : AppCompatActivity() {
         datePickerDialog.show()
     }
 
+    //mOnDoneClickListenerでは、addTaskメソッドでRealmに保存/更新したあと、
+    // finishメソッドを呼び出すことでInputActivityを閉じて前の画面（MainActivity）に戻る
     private val mOnTimeClickListener = View.OnClickListener {
         val timePickerDialog = TimePickerDialog(this,
             TimePickerDialog.OnTimeSetListener { _, hour, minute ->
@@ -56,8 +58,10 @@ class InputActivity : AppCompatActivity() {
 
         // ActionBarを設定する
         val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
+        //setSupportActionBarによってツールバーをActionBarとして使えるように設定
         setSupportActionBar(toolbar)
         if (supportActionBar != null) {
+            //setDisplayHomeAsUpEnabledメソッドで、ActionBarに戻るボタンを表示
             supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         }
 
@@ -68,11 +72,14 @@ class InputActivity : AppCompatActivity() {
 
         // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
         val intent = intent
+        //EXTRA_TASK が設定されていないとtaskId には第二引数で指定している既定値 -1 が代入される
         val taskId = intent.getIntExtra(EXTRA_TASK, -1)
         val realm = Realm.getDefaultInstance()
+        //Task の id が taskId のものが検索され、findFirst() によって最初に見つかったインスタンスが返され、 mTask へ代入
         mTask = realm.where(Task::class.java).equalTo("id", taskId).findFirst()
         realm.close()
 
+        //EXTRA_TASK が設定されていない、すなわち taskId が -1の場合、nullが代入
         if (mTask == null) {
             // 新規作成の場合
             val calendar = Calendar.getInstance()
@@ -85,6 +92,7 @@ class InputActivity : AppCompatActivity() {
             // 更新の場合
             title_edit_text.setText(mTask!!.title)
             content_edit_text.setText(mTask!!.contents)
+            category_edit_text.setText(mTask!!.category)
 
             val calendar = Calendar.getInstance()
             calendar.time = mTask!!.date
@@ -124,13 +132,14 @@ class InputActivity : AppCompatActivity() {
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
+        val category = category_edit_text.text.toString()
 
         mTask!!.title = title
         mTask!!.contents = content
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
         mTask!!.date = date
-//        mTask!!.category = category
+        mTask!!.category = category
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()
@@ -139,13 +148,17 @@ class InputActivity : AppCompatActivity() {
 
         val resultIntent = Intent(applicationContext, TaskAlarmReceiver::class.java)
         resultIntent.putExtra(EXTRA_TASK, mTask!!.id)
+        //PendingIntentは
         val resultPendingIntent = PendingIntent.getBroadcast(
             this,
             mTask!!.id,
             resultIntent,
+            //PendingIntent.FLAG_UPDATE_CURRENTは既存のPendingIntentがあれば、タスクのデータだけ置き換える
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        //第一引数のRTC_WAKEUPはUTC時間を指定する。画面スリープ中でもアラームを発行する
+        //第二引数でタスクの時間をUTC時間で指定しています。
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, resultPendingIntent)
     }}

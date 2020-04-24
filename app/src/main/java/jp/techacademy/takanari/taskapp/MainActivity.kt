@@ -10,10 +10,13 @@ import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.view.inputmethod.EditorInfo
+
 const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.TASK"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mRealm: Realm
+    //mRealmListenerはRealmのデータベースに追加や削除など変化があった場合に呼ばれるリスナー
     private val mRealmListener = object : RealmChangeListener<Realm> {
         override fun onChange(element: Realm) {
             reloadListView()
@@ -25,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         fab.setOnClickListener { view ->
             val intent = Intent(this@MainActivity, InputActivity::class.java)
@@ -46,6 +50,26 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_TASK, task.id)
             startActivity(intent)
         }
+        // カテゴリー検索
+        searchbutton.setOnClickListener {
+            val category :String? = searchview.text.toString()
+
+            if(category == ""){
+                reloadListView()
+            }else{
+                // 入力・編集する画面に遷移させる
+                val results2 = mRealm.where(Task::class.java).equalTo("category", category).findAll()
+                // 上記の結果を、TaskList としてセットする
+                mTaskAdapter.taskList = mRealm.copyFromRealm(results2)
+
+                // TaskのListView用のアダプタに渡す
+                listView1.adapter = mTaskAdapter
+
+                // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+                mTaskAdapter.notifyDataSetChanged()
+            }
+        }
+
 
         // ListViewを長押ししたときの処理
         listView1.setOnItemLongClickListener { parent, _, position, _ ->
@@ -88,7 +112,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         reloadListView()
+
     }
+
 
     private fun reloadListView() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
@@ -104,9 +130,29 @@ class MainActivity : AppCompatActivity() {
         mTaskAdapter.notifyDataSetChanged()
     }
 
+
+
+
+
+//    private fun searchListView(){
+//        //
+//        val searchRealmResults = mRealm.where(Task::class.java).equalTo("category",searchview.text.toString()).findAll()
+//
+//        // 上記の結果を、TaskList としてセットする
+//        mTaskAdapter.taskList = mRealm.copyFromRealm(searchRealmResults)
+//
+//        // TaskのListView用のアダプタに渡す
+//        listView1.adapter = mTaskAdapter
+//
+//        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+//        mTaskAdapter.notifyDataSetChanged()
+//    }
+
+
     override fun onDestroy() {
         super.onDestroy()
 
         mRealm.close()
     }
+
 }
