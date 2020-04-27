@@ -13,6 +13,8 @@ import android.app.PendingIntent
 import android.view.inputmethod.EditorInfo
 
 const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.TASK"
+//const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.Category"
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mRealm: Realm
@@ -58,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 reloadListView()
             }else{
                 // 入力・編集する画面に遷移させる
-                val results2 = mRealm.where(Task::class.java).equalTo("category", category).findAll()
+                val results2 = mRealm.where(Task::class.java).equalTo("category", searchview.text.toString()).findAll()
                 // 上記の結果を、TaskList としてセットする
                 mTaskAdapter.taskList = mRealm.copyFromRealm(results2)
 
