@@ -10,10 +10,17 @@ import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import kotlinx.android.synthetic.main.content_input.*
 
-const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.TASK"
+const val EXTRA_TASK = "jp.techacademy.takanari.taskapp"
 //const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.Category"
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var mTaskAdapter: TaskAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_TASK, task.id)
             startActivity(intent)
         }
-        // カテゴリー検索
+         //カテゴリー検索
         searchbutton.setOnClickListener {
             val category :String? = searchview.text.toString()
 
@@ -71,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                 mTaskAdapter.notifyDataSetChanged()
             }
         }
+
 
 
         // ListViewを長押ししたときの処理
@@ -131,6 +140,9 @@ class MainActivity : AppCompatActivity() {
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
         mTaskAdapter.notifyDataSetChanged()
     }
+
+
+
 
 
 

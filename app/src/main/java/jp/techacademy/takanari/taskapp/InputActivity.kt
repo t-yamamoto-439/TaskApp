@@ -12,6 +12,10 @@ import java.util.*
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import io.realm.RealmChangeListener
 
 class InputActivity : AppCompatActivity() {
 
@@ -21,6 +25,22 @@ class InputActivity : AppCompatActivity() {
     private var mHour = 0
     private var mMinute = 0
     private var mTask: Task? = null
+    //スピナーに入れる配列
+    val spinnerItems = arrayListOf<Category>()
+    //何番目か数える用
+    var count = 0
+
+    lateinit var mCategoryAdapter : CategoryAdapter
+
+    private lateinit var mRealm: Realm
+    //mRealmListenerはRealmのデータベースに追加や削除など変化があった場合に呼ばれるリスナー
+    private val mRealmListener = object : RealmChangeListener<Realm> {
+        override fun onChange(element: Realm) {
+            reloadListView()
+        }
+    }
+
+    var selectCategory = ""
 
     private val mOnDateClickListener = View.OnClickListener {
         val datePickerDialog = DatePickerDialog(this,
@@ -61,6 +81,18 @@ class InputActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input)
 
+
+
+        // Realmの設定
+        mRealm = Realm.getDefaultInstance()
+        mRealm.addChangeListener(mRealmListener)
+
+        mCategoryAdapter = CategoryAdapter(this@InputActivity)
+
+        reloadListView()
+
+
+
         // ActionBarを設定する
         val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
         //setSupportActionBarによってツールバーをActionBarとして使えるように設定
@@ -98,7 +130,7 @@ class InputActivity : AppCompatActivity() {
             // 更新の場合
             title_edit_text.setText(mTask!!.title)
             content_edit_text.setText(mTask!!.contents)
-//            category_edit_text.setText(mTask!!.category)
+//            spinnerItems.setText(mTask!!.category)
 
             val calendar = Calendar.getInstance()
             calendar.time = mTask!!.date
@@ -114,38 +146,80 @@ class InputActivity : AppCompatActivity() {
             date_button.text = dateString
             times_button.text = timeString
         }
+
+
+        //val spinner = findViewById<Spinner>(R.id.spinner)
+
+        // ArrayAdapter
+
+//        mCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        // spinner に adapter をセット
+        // Kotlin Android Extensions
+        spinner.adapter = mCategoryAdapter
+
+        // リスナーを登録
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            //　アイテムが選択された時
+            override fun onItemSelected(parent: AdapterView<*>?,
+                                        view: View?, position: Int, id: Long) {
+                selectCategory = mCategoryAdapter.categoryList[position].category
+                // Kotlin Android Extensions
+            }
+
+            //　アイテムが選択されなかった
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //
+            }
+        }
+
     }
 
+    private fun reloadListView() {
+        // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
+        val categoryRealmResults = mRealm.where(Category::class.java).findAll()
+
+        // 上記の結果を、TaskList としてセットする
+        mCategoryAdapter.categoryList= mRealm.copyFromRealm(categoryRealmResults)
+
+        // TaskのListView用のアダプタに渡す
+        spinner.adapter = mCategoryAdapter
+
+        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+        mCategoryAdapter.notifyDataSetChanged()
+    }
+
+
     private fun addTask() {
-        val realm = Realm.getDefaultInstance()
+            val realm = Realm.getDefaultInstance()
 
-        realm.beginTransaction()
+            realm.beginTransaction()
 
-        if (mTask == null) {
-            // 新規作成の場合
-            mTask = Task()
+            if (mTask == null) {
+                // 新規作成の場合
+                mTask = Task()
 
-            val taskRealmResults = realm.where(Task::class.java).findAll()
+                val taskRealmResults = realm.where(Task::class.java).findAll()
 
-            val identifier: Int =
-                if (taskRealmResults.max("id") != null) {
-                    taskRealmResults.max("id")!!.toInt() + 1
-                } else {
-                    0
-                }
-            mTask!!.id = identifier
-        }
+                val identifier: Int =
+                    if (taskRealmResults.max("id") != null) {
+                        taskRealmResults.max("id")!!.toInt() + 1
+                    } else {
+                        0
+                    }
+                mTask!!.id = identifier
+            }
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
-//        val category = category_edit_text.text.toString()
+        val category = selectCategory
 
         mTask!!.title = title
         mTask!!.contents = content
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
         mTask!!.date = date
-//        mTask!!.category = category
+        mTask!!.category = category
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()
@@ -167,4 +241,6 @@ class InputActivity : AppCompatActivity() {
         //第一引数のRTC_WAKEUPはUTC時間を指定する。画面スリープ中でもアラームを発行する
         //第二引数でタスクの時間をUTC時間で指定しています。
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, resultPendingIntent)
-    }}
+    }
+
+}

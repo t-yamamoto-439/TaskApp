@@ -14,17 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-<!--        <SearchView-->
-<!--            android:id="@+id/searchview"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content">-->
-<!--        </SearchView>-->
 
-<!--        <android.support.v7.widget.SearchView-->
-<!--            android:id="@+id/searchview"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:clickable="true" />-->
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

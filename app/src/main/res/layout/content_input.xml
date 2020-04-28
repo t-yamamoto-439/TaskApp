@@ -51,6 +51,14 @@
         android:layout_alignParentRight="true"
         android:text="決定" />
 
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="276dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/content_edit_text"
+        android:layout_alignParentLeft="@+id/category_button"
+        android:layout_marginTop="0dp" />
+
     <Button
         android:id="@+id/category_button"
         android:layout_width="96dp"

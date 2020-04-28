@@ -11,10 +11,10 @@ import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.*
 
-//Code -> Generate を選択
-class TaskAdapter(context: Context): BaseAdapter() {
+
+class CategoryAdapter (context: Context): BaseAdapter() {
     private val mLayoutInflater: LayoutInflater
-    var taskList = mutableListOf<Task>()
+    var categoryList = mutableListOf<Category>()
 
     init {
         this.mLayoutInflater = LayoutInflater.from(context)
@@ -22,17 +22,17 @@ class TaskAdapter(context: Context): BaseAdapter() {
 
     //mTaskListのサイズ
     override fun getCount(): Int {
-        return taskList.size
+        return categoryList.size
     }
 
     //mTaskListの要素
     override fun getItem(position: Int): Any {
-        return taskList[position]
+        return categoryList[position]
     }
 
     //getItemIdメソッドではidを返す
     override fun getItemId(position: Int): Long {
-        return taskList[position].id.toLong()
+        return categoryList[position].id.toLong()
     }
 
 
@@ -42,17 +42,13 @@ class TaskAdapter(context: Context): BaseAdapter() {
     //getViewメソッドではTaskのタイトルと時間をTextViewに設定
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         //convertViewは現在表示しようとしている行がnullかどうか判定を行っているのは、BaseAdapterにViewを再利用して描画する仕組みがあるため
-        val view: View = convertView ?: mLayoutInflater.inflate(R.layout.simple_list_item_2, null)
+        val view: View = convertView ?: mLayoutInflater.inflate(R.layout.simple_list_item_1, null)
 
         val textView1 = view.findViewById<TextView>(R.id.text1)
-        val textView2 = view.findViewById<TextView>(R.id.text2)
 
 
-        textView1.text = taskList[position].title
+        textView1.text = categoryList[position].category
 
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.JAPANESE)
-        val date = taskList[position].date
-        textView2.text = simpleDateFormat.format(date)
 
 
 

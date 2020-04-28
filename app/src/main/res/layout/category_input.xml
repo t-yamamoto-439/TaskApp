@@ -20,7 +20,7 @@
         android:hint="カテゴリー" />
 
     <Button
-        android:id="@+id/done_button"
+        android:id="@+id/add_button"
         android:layout_width="96dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/category_edit_text"
