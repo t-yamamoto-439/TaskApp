@@ -40,7 +40,7 @@ class InputActivity : AppCompatActivity() {
         }
     }
 
-    var selectCategory = ""
+    var selectCategory : Category?=null
 
     private val mOnDateClickListener = View.OnClickListener {
         val datePickerDialog = DatePickerDialog(this,
@@ -89,7 +89,6 @@ class InputActivity : AppCompatActivity() {
 
         mCategoryAdapter = CategoryAdapter(this@InputActivity)
 
-        reloadListView()
 
 
 
@@ -146,7 +145,7 @@ class InputActivity : AppCompatActivity() {
             date_button.text = dateString
             times_button.text = timeString
         }
-
+        reloadListView()
 
         //val spinner = findViewById<Spinner>(R.id.spinner)
 
@@ -158,12 +157,14 @@ class InputActivity : AppCompatActivity() {
         // Kotlin Android Extensions
         spinner.adapter = mCategoryAdapter
 
+//        spinner.setSelection(selectCategory.id,false)
+
         // リスナーを登録
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             //　アイテムが選択された時
             override fun onItemSelected(parent: AdapterView<*>?,
                                         view: View?, position: Int, id: Long) {
-                selectCategory = mCategoryAdapter.categoryList[position].category
+                selectCategory = mCategoryAdapter.categoryList[position]
                 // Kotlin Android Extensions
             }
 
@@ -176,9 +177,10 @@ class InputActivity : AppCompatActivity() {
     }
 
     private fun reloadListView() {
+//        mCategoryAdapter.categoryList.clear()
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
         val categoryRealmResults = mRealm.where(Category::class.java).findAll()
-
+        mCategoryAdapter.categoryList.add(Category())
         // 上記の結果を、TaskList としてセットする
         mCategoryAdapter.categoryList= mRealm.copyFromRealm(categoryRealmResults)
 
@@ -212,14 +214,15 @@ class InputActivity : AppCompatActivity() {
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
-        val category = selectCategory
+//        val category = selectCategory
 
         mTask!!.title = title
         mTask!!.contents = content
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
         mTask!!.date = date
-        mTask!!.category = category
+        //処理落ち
+        mTask!!.category = selectCategory
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()
