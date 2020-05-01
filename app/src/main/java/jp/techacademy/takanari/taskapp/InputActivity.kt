@@ -16,6 +16,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import io.realm.RealmChangeListener
+import io.realm.RealmResults
 
 class InputActivity : AppCompatActivity() {
 
@@ -41,6 +42,8 @@ class InputActivity : AppCompatActivity() {
     }
 
     var selectCategory : Category?=null
+
+    lateinit var categoryRealmResults: RealmResults<Category>
 
     private val mOnDateClickListener = View.OnClickListener {
         val datePickerDialog = DatePickerDialog(this,
@@ -81,15 +84,11 @@ class InputActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input)
 
-
-
         // Realmの設定
         mRealm = Realm.getDefaultInstance()
         mRealm.addChangeListener(mRealmListener)
 
         mCategoryAdapter = CategoryAdapter(this@InputActivity)
-
-
 
 
         // ActionBarを設定する
@@ -144,6 +143,7 @@ class InputActivity : AppCompatActivity() {
 
             date_button.text = dateString
             times_button.text = timeString
+            selectCategory = mTask!!.category
         }
         reloadListView()
 
@@ -157,7 +157,8 @@ class InputActivity : AppCompatActivity() {
         // Kotlin Android Extensions
         spinner.adapter = mCategoryAdapter
 
-//        spinner.setSelection(selectCategory.id,false)
+        spinner.setSelection(position,false)
+
 
         // リスナーを登録
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -179,7 +180,7 @@ class InputActivity : AppCompatActivity() {
     private fun reloadListView() {
 //        mCategoryAdapter.categoryList.clear()
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
-        val categoryRealmResults = mRealm.where(Category::class.java).findAll()
+        categoryRealmResults = mRealm.where(Category::class.java).findAll()
         mCategoryAdapter.categoryList.add(Category())
         // 上記の結果を、TaskList としてセットする
         mCategoryAdapter.categoryList= mRealm.copyFromRealm(categoryRealmResults)
@@ -214,15 +215,18 @@ class InputActivity : AppCompatActivity() {
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
+        val result = mRealm.where(Category::class.java).equalTo("id", selectCategory!!.id).findFirst()
+        mRealm.copyFromRealm(categoryRealmResults)
 //        val category = selectCategory
+
 
         mTask!!.title = title
         mTask!!.contents = content
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
         mTask!!.date = date
-        //処理落ち
-        mTask!!.category = selectCategory
+//        mTask!!.category = selectCategory
+        mTask!!.category = result
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()
