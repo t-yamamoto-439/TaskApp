@@ -157,7 +157,8 @@ class InputActivity : AppCompatActivity() {
         // Kotlin Android Extensions
         spinner.adapter = mCategoryAdapter
 
-        spinner.setSelection(position,false)
+        mTask?.category?.let {spinner.setSelection(it.id,false) }
+//        spinner.setSelection(position,false)
 
 
         // リスナーを登録
