@@ -15,10 +15,13 @@ import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import io.realm.RealmResults
 import kotlinx.android.synthetic.main.content_input.*
 
 const val EXTRA_TASK = "jp.techacademy.takanari.taskapp"
 //const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.Category"
+
+
 
 
 
@@ -33,6 +36,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var mTaskAdapter: TaskAdapter
+
+    lateinit var mCategoryAdapter : CategoryAdapter
+
+    lateinit var categoryRealmResults: RealmResults<Category>
+
+    var selectCategory : Category?=null
+
+    private var mTask: Task? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +63,9 @@ class MainActivity : AppCompatActivity() {
         // ListViewの設定
         mTaskAdapter = TaskAdapter(this@MainActivity)
 
+        mCategoryAdapter = CategoryAdapter(this@MainActivity)
+
+
         // ListViewをタップしたときの処理
         listView1.setOnItemClickListener { parent, _, position, _ ->
             // 入力・編集する画面に遷移させる
@@ -60,15 +74,43 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_TASK, task.id)
             startActivity(intent)
         }
-         //カテゴリー検索
-        searchbutton.setOnClickListener {
-            val category :String? = searchview.text.toString()
+//         //カテゴリー検索
+//        searchbutton.setOnClickListener {
+//            val category :String? = searchview.text.toString()
+//
+//            if(category == ""){
+//                reloadListView()
+//            }else{
+//                // 入力・編集する画面に遷移させる
+//                val results2 = mRealm.where(Task::class.java).equalTo("category", searchview.text.toString()).findAll()
+//                // 上記の結果を、TaskList としてセットする
+//                mTaskAdapter.taskList = mRealm.copyFromRealm(results2)
+//
+//                // TaskのListView用のアダプタに渡す
+//                listView1.adapter = mTaskAdapter
+//
+//                // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+//                mTaskAdapter.notifyDataSetChanged()
+//            }
+//        }
 
-            if(category == ""){
-                reloadListView()
-            }else{
-                // 入力・編集する画面に遷移させる
-                val results2 = mRealm.where(Task::class.java).equalTo("category", searchview.text.toString()).findAll()
+        // spinner に adapter をセット
+        // Kotlin Android Extensions
+        spinner1.adapter = mCategoryAdapter
+
+        mTask?.category?.let {spinner.setSelection(it.id,false) }
+//        spinner.setSelection(position,false)
+
+
+        // リスナーを登録
+        spinner1.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            //　アイテムが選択された時
+            override fun onItemSelected(parent: AdapterView<*>?,
+                                        view: View?, position: Int, id: Long) {
+//                selectCategory = mCategoryAdapter.categoryList[position]
+                // Kotlin Android Extensions
+                 //入力・編集する画面に遷移させる
+                val results2 = mRealm.where(Task::class.java).equalTo("category", mCategoryAdapter.categoryList[position]).findAll()
                 // 上記の結果を、TaskList としてセットする
                 mTaskAdapter.taskList = mRealm.copyFromRealm(results2)
 
@@ -78,7 +120,13 @@ class MainActivity : AppCompatActivity() {
                 // 表示を更新するために、アダプターにデータが変更されたことを知らせる
                 mTaskAdapter.notifyDataSetChanged()
             }
+
+            //　アイテムが選択されなかった
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //
+            }
         }
+
 
 
 
@@ -139,6 +187,18 @@ class MainActivity : AppCompatActivity() {
 
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
         mTaskAdapter.notifyDataSetChanged()
+
+        //spinner1用
+        categoryRealmResults = mRealm.where(Category::class.java).findAll()
+        mCategoryAdapter.categoryList.add(Category())
+
+        mCategoryAdapter.categoryList= mRealm.copyFromRealm(categoryRealmResults)
+
+        spinner1.adapter = mCategoryAdapter
+
+        mCategoryAdapter.notifyDataSetChanged()
+
+
     }
 
 

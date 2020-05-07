@@ -71,6 +71,7 @@ class InputActivity : AppCompatActivity() {
     }
 
     private val mOnDoneClickListener = View.OnClickListener {
+        mRealm.removeChangeListener(mRealmListener)
         addTask()
         finish()
     }

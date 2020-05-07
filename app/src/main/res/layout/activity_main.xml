@@ -15,26 +15,36 @@
         android:layout_height="match_parent">
 
 
-
-        <EditText
-            android:layout_width="match_parent"
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="216dp"
             android:layout_height="wrap_content"
-            android:id="@+id/searchview">
 
-        </EditText>
+            >
 
-        <Button
-            android:id="@+id/searchbutton"
-            android:layout_width="89dp"
-            android:layout_height="40dp"
-            android:layout_alignRight="@+id/searchview"
-            android:hint="検索"></Button>
+        </Spinner>
+
+
+
+<!--        <EditText-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:id="@+id/searchview">-->
+
+<!--        </EditText>-->
+
+<!--        <Button-->
+<!--            android:id="@+id/searchbutton"-->
+<!--            android:layout_width="89dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_alignRight="@+id/searchview"-->
+<!--            android:hint="検索"></Button>-->
 
         <ListView
             android:id="@+id/listView1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/searchview"
+            android:layout_below="@+id/spinner1"
             app:layout_anchorGravity="center" />
 
 
