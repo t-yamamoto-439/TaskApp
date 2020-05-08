@@ -22,10 +22,6 @@ const val EXTRA_TASK = "jp.techacademy.takanari.taskapp"
 //const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.Category"
 
 
-
-
-
-
 class MainActivity : AppCompatActivity() {
     private lateinit var mRealm: Realm
     //mRealmListenerはRealmのデータベースに追加や削除など変化があった場合に呼ばれるリスナー
@@ -44,6 +40,9 @@ class MainActivity : AppCompatActivity() {
     var selectCategory : Category?=null
 
     private var mTask: Task? = null
+
+    //保存用
+    var listsave = listOf<Task>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,60 +73,39 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_TASK, task.id)
             startActivity(intent)
         }
-//         //カテゴリー検索
-//        searchbutton.setOnClickListener {
-//            val category :String? = searchview.text.toString()
-//
-//            if(category == ""){
-//                reloadListView()
-//            }else{
-//                // 入力・編集する画面に遷移させる
-//                val results2 = mRealm.where(Task::class.java).equalTo("category", searchview.text.toString()).findAll()
-//                // 上記の結果を、TaskList としてセットする
-//                mTaskAdapter.taskList = mRealm.copyFromRealm(results2)
-//
-//                // TaskのListView用のアダプタに渡す
-//                listView1.adapter = mTaskAdapter
-//
-//                // 表示を更新するために、アダプターにデータが変更されたことを知らせる
-//                mTaskAdapter.notifyDataSetChanged()
-//            }
-//        }
 
         // spinner に adapter をセット
         // Kotlin Android Extensions
         spinner1.adapter = mCategoryAdapter
 
         mTask?.category?.let {spinner.setSelection(it.id,false) }
-//        spinner.setSelection(position,false)
 
 
-        // リスナーを登録
+// リスナーを登録
         spinner1.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             //　アイテムが選択された時
             override fun onItemSelected(parent: AdapterView<*>?,
                                         view: View?, position: Int, id: Long) {
-//                selectCategory = mCategoryAdapter.categoryList[position]
-                // Kotlin Android Extensions
-                 //入力・編集する画面に遷移させる
-                val results2 = mRealm.where(Task::class.java).equalTo("category", mCategoryAdapter.categoryList[position]).findAll()
-                // 上記の結果を、TaskList としてセットする
-                mTaskAdapter.taskList = mRealm.copyFromRealm(results2)
+                val newList =
+                if (mCategoryAdapter.categoryList[position].category == ""){
+                    listsave
+                }
+                else {
+                        listsave.filter { it.category?.category == mCategoryAdapter.categoryList[position].category }
+                }
 
+                // 上記の結果を、TaskList としてセットする
+                mTaskAdapter.taskList = newList
                 // TaskのListView用のアダプタに渡す
                 listView1.adapter = mTaskAdapter
-
                 // 表示を更新するために、アダプターにデータが変更されたことを知らせる
                 mTaskAdapter.notifyDataSetChanged()
             }
 
             //　アイテムが選択されなかった
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
             }
         }
-
-
 
 
         // ListViewを長押ししたときの処理
@@ -169,9 +147,7 @@ class MainActivity : AppCompatActivity() {
 
             true
         }
-
         reloadListView()
-
     }
 
 
@@ -185,43 +161,30 @@ class MainActivity : AppCompatActivity() {
         // TaskのListView用のアダプタに渡す
         listView1.adapter = mTaskAdapter
 
+        //弄る用
+        mTaskAdapter.taskList = mRealm.copyFromRealm(taskRealmResults)
+
+        //保存用
+        listsave = mRealm.copyFromRealm(taskRealmResults)
+
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
         mTaskAdapter.notifyDataSetChanged()
 
         //spinner1用
-        categoryRealmResults = mRealm.where(Category::class.java).findAll()
-        mCategoryAdapter.categoryList.add(Category())
+//        categoryRealmResults = mRealm.where(Category::class.java).findAll()
+//        mCategoryAdapter.categoryList.add(Category())
 
-        mCategoryAdapter.categoryList= mRealm.copyFromRealm(categoryRealmResults)
+        categoryRealmResults = mRealm.where(Category::class.java).findAll()
+        mCategoryAdapter.categoryList.clear()
+        mCategoryAdapter.categoryList.add(Category())
+        // 上記の結果を、TaskList としてセットする
+        mCategoryAdapter.categoryList.addAll(mRealm.copyFromRealm(categoryRealmResults))
 
         spinner1.adapter = mCategoryAdapter
 
         mCategoryAdapter.notifyDataSetChanged()
 
-
     }
-
-
-
-
-
-
-
-
-//    private fun searchListView(){
-//        //
-//        val searchRealmResults = mRealm.where(Task::class.java).equalTo("category",searchview.text.toString()).findAll()
-//
-//        // 上記の結果を、TaskList としてセットする
-//        mTaskAdapter.taskList = mRealm.copyFromRealm(searchRealmResults)
-//
-//        // TaskのListView用のアダプタに渡す
-//        listView1.adapter = mTaskAdapter
-//
-//        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
-//        mTaskAdapter.notifyDataSetChanged()
-//    }
-
 
     override fun onDestroy() {
         super.onDestroy()

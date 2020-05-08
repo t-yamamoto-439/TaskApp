@@ -148,17 +148,9 @@ class InputActivity : AppCompatActivity() {
         }
         reloadListView()
 
-        //val spinner = findViewById<Spinner>(R.id.spinner)
-
-        // ArrayAdapter
-
-//        mCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        // spinner に adapter をセット
-        // Kotlin Android Extensions
         spinner.adapter = mCategoryAdapter
 
-        mTask?.category?.let {spinner.setSelection(it.id,false) }
+        selectCategory?.let {spinner.setSelection(it.id+1,false) }
 //        spinner.setSelection(position,false)
 
 
@@ -173,7 +165,6 @@ class InputActivity : AppCompatActivity() {
 
             //　アイテムが選択されなかった
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
             }
         }
 
@@ -183,10 +174,10 @@ class InputActivity : AppCompatActivity() {
 //        mCategoryAdapter.categoryList.clear()
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
         categoryRealmResults = mRealm.where(Category::class.java).findAll()
-        mCategoryAdapter.categoryList.add(Category())
+        mCategoryAdapter.categoryList.clear()
+        mCategoryAdapter.categoryList.add(Category().apply { id = -1; category = "カテゴリーの選択" })
         // 上記の結果を、TaskList としてセットする
-        mCategoryAdapter.categoryList= mRealm.copyFromRealm(categoryRealmResults)
-
+        mCategoryAdapter.categoryList.addAll(mRealm.copyFromRealm(categoryRealmResults))
         // TaskのListView用のアダプタに渡す
         spinner.adapter = mCategoryAdapter
 
@@ -217,9 +208,10 @@ class InputActivity : AppCompatActivity() {
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
-        val result = mRealm.where(Category::class.java).equalTo("id", selectCategory!!.id).findFirst()
-        mRealm.copyFromRealm(categoryRealmResults)
-//        val category = selectCategory
+        selectCategory?.let { if(it.id != -1){ val result = mRealm.where(Category::class.java).equalTo("id", selectCategory!!.id).findFirst()
+            mRealm.copyFromRealm(categoryRealmResults)
+            mTask!!.category = result
+        } }
 
 
         mTask!!.title = title
@@ -227,8 +219,6 @@ class InputActivity : AppCompatActivity() {
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
         mTask!!.date = date
-//        mTask!!.category = selectCategory
-        mTask!!.category = result
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()

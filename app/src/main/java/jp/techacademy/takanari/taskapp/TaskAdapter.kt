@@ -14,7 +14,7 @@ import java.util.*
 //Code -> Generate を選択
 class TaskAdapter(context: Context): BaseAdapter() {
     private val mLayoutInflater: LayoutInflater
-    var taskList = mutableListOf<Task>()
+    var taskList = listOf<Task>()
 
     init {
         this.mLayoutInflater = LayoutInflater.from(context)
