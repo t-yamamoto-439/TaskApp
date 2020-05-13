@@ -13,6 +13,7 @@ import java.util.*
 
 //Code -> Generate を選択
 class TaskAdapter(context: Context): BaseAdapter() {
+    //LayoutInflaterは他のxmlリソースのViewを取り扱うための仕組み
     private val mLayoutInflater: LayoutInflater
     var taskList = listOf<Task>()
 

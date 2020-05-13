@@ -25,6 +25,7 @@ class InputActivity : AppCompatActivity() {
     private var mDay = 0
     private var mHour = 0
     private var mMinute = 0
+    //Task?はnullが入ってても大丈夫にする
     private var mTask: Task? = null
     //スピナーに入れる配列
     val spinnerItems = arrayListOf<Category>()
@@ -43,6 +44,7 @@ class InputActivity : AppCompatActivity() {
 
     var selectCategory : Category?=null
 
+    //カテゴリー型のRealmResultsという箱　　RealmResultsはRealmから撮ってきたデータを入れる箱
     lateinit var categoryRealmResults: RealmResults<Category>
 
     private val mOnDateClickListener = View.OnClickListener {
@@ -150,13 +152,15 @@ class InputActivity : AppCompatActivity() {
 
         spinner.adapter = mCategoryAdapter
 
+        //setselectionはスピナーの2番目にselectCategoryをセットする
         selectCategory?.let {spinner.setSelection(it.id+1,false) }
 //        spinner.setSelection(position,false)
 
 
-        // リスナーを登録
+        // リスナーを登録　スピナーが選択された時に呼ばれるリスナー
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             //　アイテムが選択された時
+            //カテゴリーアダプターのスピナーの場所を指定する
             override fun onItemSelected(parent: AdapterView<*>?,
                                         view: View?, position: Int, id: Long) {
                 selectCategory = mCategoryAdapter.categoryList[position]
@@ -173,12 +177,13 @@ class InputActivity : AppCompatActivity() {
     private fun reloadListView() {
 //        mCategoryAdapter.categoryList.clear()
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
+        //Log
         categoryRealmResults = mRealm.where(Category::class.java).findAll()
         mCategoryAdapter.categoryList.clear()
         mCategoryAdapter.categoryList.add(Category().apply { id = -1; category = "カテゴリーの選択" })
-        // 上記の結果を、TaskList としてセットする
+        //
         mCategoryAdapter.categoryList.addAll(mRealm.copyFromRealm(categoryRealmResults))
-        // TaskのListView用のアダプタに渡す
+        //
         spinner.adapter = mCategoryAdapter
 
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
@@ -189,6 +194,8 @@ class InputActivity : AppCompatActivity() {
     private fun addTask() {
             val realm = Realm.getDefaultInstance()
 
+            //Realmでデータを追加、削除など変更を行う場合はbeginTransactionメソッドを呼び出し、
+            // 削除などの処理、そして最後にcommitTransactionメソッド(231行目)を呼び出す必要があります。
             realm.beginTransaction()
 
             if (mTask == null) {

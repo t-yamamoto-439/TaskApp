@@ -19,7 +19,6 @@ import io.realm.RealmResults
 import kotlinx.android.synthetic.main.content_input.*
 
 const val EXTRA_TASK = "jp.techacademy.takanari.taskapp"
-//const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.Category"
 
 
 class MainActivity : AppCompatActivity() {

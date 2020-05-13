@@ -16,6 +16,7 @@ class CategoryAdapter (context: Context): BaseAdapter() {
     private val mLayoutInflater: LayoutInflater
     var categoryList = mutableListOf<Category>()
 
+    //initは初期化
     init {
         this.mLayoutInflater = LayoutInflater.from(context)
     }
@@ -42,15 +43,14 @@ class CategoryAdapter (context: Context): BaseAdapter() {
     //getViewメソッドではTaskのタイトルと時間をTextViewに設定
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         //convertViewは現在表示しようとしている行がnullかどうか判定を行っているのは、BaseAdapterにViewを再利用して描画する仕組みがあるため
+        //スピナーを表示する際に、UIを決めている部分
         val view: View = convertView ?: mLayoutInflater.inflate(R.layout.simple_list_item_1, null)
 
+        //UI部分を撮ってくる
         val textView1 = view.findViewById<TextView>(R.id.text1)
 
-
+        //撮ってきたUI部分にカテゴリーリストに設定されてあるカテゴリー名を設定する
         textView1.text = categoryList[position].category
-
-
-
 
         return view
     }
